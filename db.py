@@ -1,10 +1,8 @@
 import sqlite3
 
-# Datenbank-Verbindung
 conn = sqlite3.connect('social_bot.db', check_same_thread=False)
 c = conn.cursor()
 
-# Tabellen erstellen
 def init_db():
     c.execute('''
     CREATE TABLE IF NOT EXISTS users (
