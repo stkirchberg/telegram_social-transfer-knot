@@ -23,7 +23,7 @@ async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
     c.execute('''
-        SELECT posts.id, users.nickname, posts.text
+        SELECT posts.id, users.nickname, posts.text, posts.created_at
         FROM posts
         JOIN users ON posts.user_id = users.id
         ORDER BY posts.created_at DESC
@@ -33,8 +33,13 @@ async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not posts:
         await update.message.reply_text("Keine Beiträge vorhanden.")
         return
-    msg = "\n\n".join([f"{pid}. {nick}: {text}" for pid, nick, text in posts])
+
+    msg = "\n\n".join([
+        f"{nick} ({created_at}):\n{text}"
+        for _, nick, text, created_at in posts
+    ])
     await update.message.reply_text(msg)
+
 
 
 async def like(update: Update, context: ContextTypes.DEFAULT_TYPE):
