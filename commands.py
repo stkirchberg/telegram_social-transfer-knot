@@ -7,18 +7,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_id = update.effective_user.id
     nickname = update.effective_user.username or f"user{telegram_id}"
     get_or_create_user(telegram_id, nickname)
-    await update.message.reply_text(f"Willkommen {nickname}! Nutze /post, um etwas zu posten.")
+    await update.message.reply_text(f"Welcome {nickname}! Use /post to create a post.")
 
 
 async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = get_or_create_user(update.effective_user.id, update.effective_user.username)
     text = ' '.join(context.args)
     if not text:
-        await update.message.reply_text("Bitte gib einen Text an: /post Dein Text hier")
+        await update.message.reply_text("Please provide some text: /post Your text here")
         return
     c.execute("INSERT INTO posts (user_id, text) VALUES (?, ?)", (user_id, text))
     conn.commit()
-    await update.message.reply_text("Beitrag gespeichert!")
+    await update.message.reply_text("Post saved!")
 
 
 async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -31,7 +31,7 @@ async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ''')
     posts = c.fetchall()
     if not posts:
-        await update.message.reply_text("Keine Beiträge vorhanden.")
+        await update.message.reply_text("No posts available.")
         return
 
     msg = "\n\n".join([
@@ -41,17 +41,16 @@ async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(msg)
 
 
-
 async def like(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
-        await update.message.reply_text("Bitte gib die Post-ID an: /like 1")
+        await update.message.reply_text("Please provide the post ID: /like 1")
         return
     try:
         post_id = int(context.args[0])
     except ValueError:
-        await update.message.reply_text("Ungültige Post-ID.")
+        await update.message.reply_text("Invalid post ID.")
         return
     user_id = get_or_create_user(update.effective_user.id, update.effective_user.username)
     c.execute("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", (user_id, post_id))
     conn.commit()
-    await update.message.reply_text(f"Du hast Beitrag {post_id} geliked!")
+    await update.message.reply_text(f"You liked post {post_id}!")
