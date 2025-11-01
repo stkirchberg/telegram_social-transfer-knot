@@ -7,7 +7,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_id = update.effective_user.id
     nickname = update.effective_user.username or f"user{telegram_id}"
     get_or_create_user(telegram_id, nickname)
-    await update.message.reply_text(f"Welcome {nickname}! Use /post to create a post.")
+
+    welcome_message = (
+        f"Welcome {nickname}!\n\n"
+        "Here are the commands you can use:\n"
+        "/post <text> - Create a new post\n"
+        "/feed - Show the latest posts\n"
+        "/like <post_id> - Like a post\n"
+    )
+
+    await update.message.reply_text(welcome_message)
 
 
 async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -54,3 +63,4 @@ async def like(update: Update, context: ContextTypes.DEFAULT_TYPE):
     c.execute("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", (user_id, post_id))
     conn.commit()
     await update.message.reply_text(f"You liked post {post_id}!")
+
