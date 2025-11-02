@@ -4,7 +4,7 @@ import commands
 
 init_db()
 
-BOT_TOKEN = "8207945725:AAG2YW2ezeb3rSru21db8Z88Z1kPRJtQCMI"
+BOT_TOKEN = "12345678:aaaBBBcccDDDeeeFFF"
 app = ApplicationBuilder().token(BOT_TOKEN).build()
 
 app.add_handler(CommandHandler("start", commands.start))
