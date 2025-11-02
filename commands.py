@@ -23,7 +23,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_id = update.effective_user.id
     if not has_nickname(telegram_id):
-        await update.message.reply_text("You need to set a nickname first using /setname <nickname>.")
+        await update.message.reply_text("❌ You need to set a nickname first using /setname <nickname>.")
         return
 
     user_id = get_or_create_user(telegram_id)
@@ -32,9 +32,35 @@ async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Please provide some text: /post Your text here")
         return
 
+    # Post speichern
     c.execute("INSERT INTO posts (user_id, text) VALUES (?, ?)", (user_id, text))
     conn.commit()
-    await update.message.reply_text("✅ Post saved!")
+
+    # Post-ID und Zeit holen
+    c.execute("SELECT id, created_at FROM posts WHERE rowid = last_insert_rowid()")
+    post_id, created_at = c.fetchone()
+
+    # Nickname holen
+    c.execute("SELECT nickname FROM users WHERE telegram_id=?", (telegram_id,))
+    nickname = c.fetchone()[0]
+
+    # Nachricht, die an andere gesendet wird
+    broadcast_text = (
+        f"🆕 New post by {nickname} (ID {post_id}, {created_at}):\n"
+        f"{text}\n\n❤️ Like with /like {post_id}"
+    )
+
+    # Alle anderen Empfänger holen
+    c.execute("SELECT telegram_id FROM users WHERE telegram_id != ?", (telegram_id,))
+    recipients = c.fetchall()
+
+    for (recipient_id,) in recipients:
+        try:
+            await context.bot.send_message(chat_id=recipient_id, text=broadcast_text)
+        except Exception as e:
+            print(f"Could not send to {recipient_id}: {e}")
+
+    await update.message.reply_text("✅ Post sent to everyone!")
 
 
 async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -52,7 +78,7 @@ async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     msg = "\n\n".join([
-        f"🆔 {post_id} | {nick} ({created_at}):\n{text}"
+        f"ID: {post_id} | {nick} ({created_at}):\n{text}"
         for post_id, nick, text, created_at in posts
     ])
     await update.message.reply_text(msg)
@@ -61,7 +87,7 @@ async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def like(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_id = update.effective_user.id
     if not has_nickname(telegram_id):
-        await update.message.reply_text("You need to set a nickname first using /setname <nickname>.")
+        await update.message.reply_text("❌ You need to set a nickname first using /setname <nickname>.")
         return
 
     if not context.args:
@@ -100,4 +126,4 @@ async def setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if success:
         await update.message.reply_text(f"✅ Your nickname has been set to '{nickname}'.")
     else:
-        await update.message.reply_text("❌ This nickname is already taken. Please choose another one.")
+        await update.message.reply_text("❌ This nickname is already taken (case-insensitive). Please choose another one.")

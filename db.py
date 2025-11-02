@@ -42,7 +42,6 @@ def get_or_create_user(telegram_id, nickname=None):
     user = c.fetchone()
     if user:
         return user[0]
-
     c.execute("INSERT INTO users (telegram_id, nickname) VALUES (?, ?)", (telegram_id, nickname))
     conn.commit()
     return c.lastrowid
@@ -50,16 +49,16 @@ def get_or_create_user(telegram_id, nickname=None):
 
 def has_nickname(telegram_id):
     c.execute("SELECT nickname FROM users WHERE telegram_id=?", (telegram_id,))
-    user = c.fetchone()
-    return bool(user and user[0])
+    result = c.fetchone()
+    return bool(result and result[0])
 
 
 def set_nickname(telegram_id, nickname):
-    c.execute("SELECT id FROM users WHERE LOWER(nickname)=LOWER(?)", (nickname,))
+    c.execute("SELECT id FROM users WHERE nickname = ? COLLATE NOCASE", (nickname,))
     if c.fetchone():
         return False
 
-    get_or_create_user(telegram_id)
+    user_id = get_or_create_user(telegram_id)
     c.execute("UPDATE users SET nickname=? WHERE telegram_id=?", (nickname, telegram_id))
     conn.commit()
     return True
