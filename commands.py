@@ -9,11 +9,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     welcome_message = (
         "👋 Welcome!\n\n"
-        "Before you can post or like, please set a nickname using:\n"
+        "Before you can post, please set a nickname using:\n"
         "/setname <nickname>\n\n"
         "Available commands:\n"
         "/post <text> – Create a new post\n"
-        "/feed – Show the latest posts\n"
         "/like <post_id> – Like a post\n"
         "/setname <nickname> – Choose your nickname"
     )
@@ -41,42 +40,22 @@ async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     nickname = c.fetchone()[0]
 
     broadcast_text = (
-        f"{nickname} (ID {post_id}, {created_at}):\n"
+        f"<b>{nickname}</b> (ID {post_id}, {created_at}):\n"
         f"{text}\n\n❤️ Like with /like {post_id}"
     )
 
-
-    c.execute("SELECT telegram_id FROM users WHERE telegram_id != ?", (telegram_id,))
+    c.execute("SELECT telegram_id FROM users")
     recipients = c.fetchall()
 
     for (recipient_id,) in recipients:
         try:
-            await context.bot.send_message(chat_id=recipient_id, text=broadcast_text)
+            await context.bot.send_message(
+                chat_id=recipient_id,
+                text=broadcast_text,
+                parse_mode="HTML"
+            )
         except Exception as e:
             print(f"Could not send to {recipient_id}: {e}")
-
-    await update.message.reply_text("✅ Post sent to everyone!")
-
-
-async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    c.execute('''
-        SELECT posts.id, users.nickname, posts.text, posts.created_at
-        FROM posts
-        JOIN users ON posts.user_id = users.id
-        ORDER BY posts.created_at DESC
-        LIMIT 5
-    ''')
-    posts = c.fetchall()
-
-    if not posts:
-        await update.message.reply_text("No posts available yet.")
-        return
-
-    msg = "\n\n".join([
-        f"ID: {post_id} | {nick} ({created_at}):\n{text}"
-        for post_id, nick, text, created_at in posts
-    ])
-    await update.message.reply_text(msg)
 
 
 async def like(update: Update, context: ContextTypes.DEFAULT_TYPE):

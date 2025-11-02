@@ -58,7 +58,7 @@ def set_nickname(telegram_id, nickname):
     if c.fetchone():
         return False
 
-    user_id = get_or_create_user(telegram_id)
+    get_or_create_user(telegram_id)
     c.execute("UPDATE users SET nickname=? WHERE telegram_id=?", (nickname, telegram_id))
     conn.commit()
     return True
