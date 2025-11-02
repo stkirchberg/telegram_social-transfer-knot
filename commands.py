@@ -41,7 +41,7 @@ async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     nickname = c.fetchone()[0]
 
     broadcast_text = (
-        f"🆕 New post by {nickname} (ID {post_id}, {created_at}):\n"
+        f"{nickname} (ID {post_id}, {created_at}):\n"
         f"{text}\n\n❤️ Like with /like {post_id}"
     )
 
