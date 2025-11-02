@@ -32,25 +32,20 @@ async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Please provide some text: /post Your text here")
         return
 
-    # Post speichern
     c.execute("INSERT INTO posts (user_id, text) VALUES (?, ?)", (user_id, text))
     conn.commit()
-
-    # Post-ID und Zeit holen
     c.execute("SELECT id, created_at FROM posts WHERE rowid = last_insert_rowid()")
     post_id, created_at = c.fetchone()
 
-    # Nickname holen
     c.execute("SELECT nickname FROM users WHERE telegram_id=?", (telegram_id,))
     nickname = c.fetchone()[0]
 
-    # Nachricht, die an andere gesendet wird
     broadcast_text = (
         f"🆕 New post by {nickname} (ID {post_id}, {created_at}):\n"
         f"{text}\n\n❤️ Like with /like {post_id}"
     )
 
-    # Alle anderen Empfänger holen
+
     c.execute("SELECT telegram_id FROM users WHERE telegram_id != ?", (telegram_id,))
     recipients = c.fetchall()
 
