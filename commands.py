@@ -13,7 +13,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/setname <nickname>\n\n"
         "Available commands:\n"
         "/post <text> – Create a new post\n"
-        "/like <post_id> – Like a post\n"
         "/setname <nickname> – Choose your nickname"
     )
     await update.message.reply_text(welcome_message)
@@ -41,7 +40,7 @@ async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     broadcast_text = (
         f"<b>{nickname}</b> (ID {post_id}, {created_at}):\n"
-        f"{text}\n\n❤️ Like with /like {post_id}"
+        f"{text}"
     )
 
     c.execute("SELECT telegram_id FROM users")
@@ -56,28 +55,6 @@ async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         except Exception as e:
             print(f"Could not send to {recipient_id}: {e}")
-
-
-async def like(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    telegram_id = update.effective_user.id
-    if not has_nickname(telegram_id):
-        await update.message.reply_text("❌ You need to set a nickname first using /setname <nickname>.")
-        return
-
-    if not context.args:
-        await update.message.reply_text("Please provide the post ID: /like 1")
-        return
-
-    try:
-        post_id = int(context.args[0])
-    except ValueError:
-        await update.message.reply_text("Invalid post ID.")
-        return
-
-    user_id = get_or_create_user(telegram_id)
-    c.execute("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", (user_id, post_id))
-    conn.commit()
-    await update.message.reply_text(f"You liked post {post_id} ❤️")
 
 
 async def setname(update: Update, context: ContextTypes.DEFAULT_TYPE):

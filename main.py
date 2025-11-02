@@ -9,8 +9,6 @@ app = ApplicationBuilder().token(BOT_TOKEN).build()
 
 app.add_handler(CommandHandler("start", commands.start))
 app.add_handler(CommandHandler("post", commands.post))
-app.add_handler(CommandHandler("feed", commands.feed))
-app.add_handler(CommandHandler("like", commands.like))
 app.add_handler(CommandHandler("setname", commands.setname))
 
 
