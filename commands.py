@@ -1,33 +1,40 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from db import c, conn, get_or_create_user
+from db import c, conn, get_or_create_user, has_nickname, set_nickname
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_id = update.effective_user.id
-    nickname = update.effective_user.username or f"user{telegram_id}"
-    get_or_create_user(telegram_id, nickname)
+    get_or_create_user(telegram_id)
 
     welcome_message = (
-        f"Welcome {nickname}!\n\n"
-        "Here are the commands you can use:\n"
-        "/post <text> - Create a new post\n"
-        "/feed - Show the latest posts\n"
-        "/like <post_id> - Like a post\n"
+        "👋 Welcome!\n\n"
+        "Before you can post or like, please set a nickname using:\n"
+        "/setname <nickname>\n\n"
+        "Available commands:\n"
+        "/post <text> – Create a new post\n"
+        "/feed – Show the latest posts\n"
+        "/like <post_id> – Like a post\n"
+        "/setname <nickname> – Choose your nickname"
     )
-
     await update.message.reply_text(welcome_message)
 
 
 async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = get_or_create_user(update.effective_user.id, update.effective_user.username)
+    telegram_id = update.effective_user.id
+    if not has_nickname(telegram_id):
+        await update.message.reply_text("You need to set a nickname first using /setname <nickname>.")
+        return
+
+    user_id = get_or_create_user(telegram_id)
     text = ' '.join(context.args)
     if not text:
         await update.message.reply_text("Please provide some text: /post Your text here")
         return
+
     c.execute("INSERT INTO posts (user_id, text) VALUES (?, ?)", (user_id, text))
     conn.commit()
-    await update.message.reply_text("Post saved!")
+    await update.message.reply_text("✅ Post saved!")
 
 
 async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -39,28 +46,58 @@ async def feed(update: Update, context: ContextTypes.DEFAULT_TYPE):
         LIMIT 5
     ''')
     posts = c.fetchall()
+
     if not posts:
-        await update.message.reply_text("No posts available.")
+        await update.message.reply_text("No posts available yet.")
         return
 
     msg = "\n\n".join([
-        f"{nick} ({created_at}):\n{text}"
-        for _, nick, text, created_at in posts
+        f"🆔 {post_id} | {nick} ({created_at}):\n{text}"
+        for post_id, nick, text, created_at in posts
     ])
     await update.message.reply_text(msg)
 
 
 async def like(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    telegram_id = update.effective_user.id
+    if not has_nickname(telegram_id):
+        await update.message.reply_text("You need to set a nickname first using /setname <nickname>.")
+        return
+
     if not context.args:
         await update.message.reply_text("Please provide the post ID: /like 1")
         return
+
     try:
         post_id = int(context.args[0])
     except ValueError:
         await update.message.reply_text("Invalid post ID.")
         return
-    user_id = get_or_create_user(update.effective_user.id, update.effective_user.username)
+
+    user_id = get_or_create_user(telegram_id)
     c.execute("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", (user_id, post_id))
     conn.commit()
-    await update.message.reply_text(f"You liked post {post_id}!")
+    await update.message.reply_text(f"You liked post {post_id} ❤️")
 
+
+async def setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    telegram_id = update.effective_user.id
+
+    if not context.args:
+        await update.message.reply_text("Usage: /setname <nickname>")
+        return
+
+    nickname = context.args[0].strip()
+
+    if len(nickname) < 3 or len(nickname) > 20:
+        await update.message.reply_text("Nickname must be between 3 and 20 characters.")
+        return
+    if not nickname.isalnum():
+        await update.message.reply_text("Nickname must be alphanumeric (letters/numbers only).")
+        return
+
+    success = set_nickname(telegram_id, nickname)
+    if success:
+        await update.message.reply_text(f"✅ Your nickname has been set to '{nickname}'.")
+    else:
+        await update.message.reply_text("❌ This nickname is already taken. Please choose another one.")

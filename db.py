@@ -3,12 +3,13 @@ import sqlite3
 conn = sqlite3.connect('social_bot.db', check_same_thread=False)
 c = conn.cursor()
 
+
 def init_db():
     c.execute('''
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         telegram_id INTEGER UNIQUE,
-        nickname TEXT,
+        nickname TEXT COLLATE NOCASE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     ''')
@@ -35,11 +36,30 @@ def init_db():
     ''')
     conn.commit()
 
+
 def get_or_create_user(telegram_id, nickname=None):
     c.execute("SELECT id FROM users WHERE telegram_id=?", (telegram_id,))
     user = c.fetchone()
     if user:
         return user[0]
+
     c.execute("INSERT INTO users (telegram_id, nickname) VALUES (?, ?)", (telegram_id, nickname))
     conn.commit()
     return c.lastrowid
+
+
+def has_nickname(telegram_id):
+    c.execute("SELECT nickname FROM users WHERE telegram_id=?", (telegram_id,))
+    user = c.fetchone()
+    return bool(user and user[0])
+
+
+def set_nickname(telegram_id, nickname):
+    c.execute("SELECT id FROM users WHERE LOWER(nickname)=LOWER(?)", (nickname,))
+    if c.fetchone():
+        return False
+
+    get_or_create_user(telegram_id)
+    c.execute("UPDATE users SET nickname=? WHERE telegram_id=?", (nickname, telegram_id))
+    conn.commit()
+    return True
