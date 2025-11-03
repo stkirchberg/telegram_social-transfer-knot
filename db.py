@@ -67,3 +67,25 @@ def is_authenticated(telegram_id):
     c.execute("SELECT 1 FROM users WHERE telegram_id=?", (telegram_id,))
     return c.fetchone() is not None
 
+
+def delete_user(identifier):
+    """Delete user by nickname OR telegram_id"""
+    c.execute("SELECT id FROM users WHERE nickname=? COLLATE NOCASE", (identifier,))
+    user = c.fetchone()
+
+    if not user:
+        try:
+            telegram_id = int(identifier)
+            c.execute("SELECT id FROM users WHERE telegram_id=?", (telegram_id,))
+            user = c.fetchone()
+        except ValueError:
+            return False
+
+    if not user:
+        return False
+
+    user_id = user[0]
+    c.execute("DELETE FROM posts WHERE user_id=?", (user_id,))
+    c.execute("DELETE FROM users WHERE id=?", (user_id,))
+    conn.commit()
+    return True

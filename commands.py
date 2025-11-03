@@ -1,7 +1,10 @@
 import secrets
 from telegram import Update
 from telegram.ext import ContextTypes
-from db import c, conn, get_or_create_user, has_nickname, set_nickname, is_authenticated
+from db import c, conn, get_or_create_user, has_nickname, set_nickname, is_authenticated, delete_user
+
+
+ADMIN_ID = 123456789  # RELPACE WITH YOUR TELEGRAM ID TO BE AN ADMIN
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -39,14 +42,15 @@ async def login(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     get_or_create_user(telegram_id)
+
     c.execute("UPDATE tokens SET used=1 WHERE id=?", (token_row[0],))
+    c.execute("DELETE FROM tokens WHERE id=?", (token_row[0],))
     conn.commit()
 
     await update.message.reply_text("✅ Access granted. You are now logged in!")
 
 
 async def generate_token(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    ADMIN_ID = 123456789  # YOUR TELEGRAM ID FOR ADMIN RIGHTS
     if update.effective_user.id != ADMIN_ID:
         await update.message.reply_text("❌ You are not allowed to generate tokens.")
         return
@@ -62,6 +66,23 @@ async def generate_token(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conn.commit()
     await update.message.reply_text("✅ Generated tokens:\n" + "\n".join(new_tokens))
 
+
+async def deleteuser(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text("❌ You are not allowed to delete users.")
+        return
+
+    if not context.args:
+        await update.message.reply_text("Usage: /deleteuser <nickname or telegram_id>")
+        return
+
+    identifier = context.args[0].strip()
+    success = delete_user(identifier)
+
+    if success:
+        await update.message.reply_text(f"✅ User '{identifier}' has been deleted (including their posts).")
+    else:
+        await update.message.reply_text("❌ User not found or invalid input.")
 
 
 async def setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
