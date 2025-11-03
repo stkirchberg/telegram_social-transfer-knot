@@ -24,6 +24,15 @@ def init_db():
     )
     ''')
 
+    c.execute('''
+    CREATE TABLE IF NOT EXISTS tokens (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        token TEXT UNIQUE,
+        used BOOLEAN DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+
     conn.commit()
 
 
@@ -52,3 +61,9 @@ def set_nickname(telegram_id, nickname):
     c.execute("UPDATE users SET nickname=? WHERE telegram_id=?", (nickname, telegram_id))
     conn.commit()
     return True
+
+
+def is_authenticated(telegram_id):
+    c.execute("SELECT 1 FROM users WHERE telegram_id=?", (telegram_id,))
+    return c.fetchone() is not None
+

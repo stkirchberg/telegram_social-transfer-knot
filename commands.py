@@ -1,25 +1,103 @@
+import secrets
 from telegram import Update
 from telegram.ext import ContextTypes
-from db import c, conn, get_or_create_user, has_nickname, set_nickname
+from db import c, conn, get_or_create_user, has_nickname, set_nickname, is_authenticated
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    telegram_id = update.effective_user.id
-    get_or_create_user(telegram_id)
-
     welcome_message = (
         "👋 Welcome!\n\n"
-        "Before you can post, please set a nickname using:\n"
+        "Before you can use this bot, you need to log in with a one-time token:\n"
+        "/login <token>\n\n"
+        "After that, set your nickname:\n"
         "/setname <nickname>\n\n"
         "Available commands:\n"
+        "/login <token> – Access with a one-time password\n"
+        "/setname <nickname> – Choose your nickname\n"
         "/post <text> – Create a new post\n"
-        "/setname <nickname> – Choose your nickname"
     )
     await update.message.reply_text(welcome_message)
 
 
+async def login(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    telegram_id = update.effective_user.id
+
+    if not context.args:
+        await update.message.reply_text("Usage: /login <token>")
+        return
+
+    token = context.args[0].strip()
+
+    c.execute("SELECT id, used FROM tokens WHERE token=?", (token,))
+    token_row = c.fetchone()
+
+    if not token_row:
+        await update.message.reply_text("❌ Invalid token.")
+        return
+    if token_row[1]:
+        await update.message.reply_text("❌ This token has already been used.")
+        return
+
+    get_or_create_user(telegram_id)
+    c.execute("UPDATE tokens SET used=1 WHERE id=?", (token_row[0],))
+    conn.commit()
+
+    await update.message.reply_text("✅ Access granted. You are now logged in!")
+
+
+async def generate_token(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ADMIN_ID = 123456789  # YOUR TELEGRAM ID FOR ADMIN RIGHTS
+    if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text("❌ You are not allowed to generate tokens.")
+        return
+
+    amount = int(context.args[0]) if context.args else 1
+    new_tokens = []
+
+    for _ in range(amount):
+        token = secrets.token_hex(4)
+        c.execute("INSERT INTO tokens (token) VALUES (?)", (token,))
+        new_tokens.append(token)
+
+    conn.commit()
+    await update.message.reply_text("✅ Generated tokens:\n" + "\n".join(new_tokens))
+
+
+
+async def setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    telegram_id = update.effective_user.id
+
+    if not is_authenticated(telegram_id):
+        await update.message.reply_text("❌ You must log in first using /login <token>.")
+        return
+
+    if not context.args:
+        await update.message.reply_text("Usage: /setname <nickname>")
+        return
+
+    nickname = context.args[0].strip()
+
+    if len(nickname) < 3 or len(nickname) > 20:
+        await update.message.reply_text("Nickname must be between 3 and 20 characters.")
+        return
+    if not nickname.isalnum():
+        await update.message.reply_text("Nickname must be alphanumeric (letters/numbers only).")
+        return
+
+    success = set_nickname(telegram_id, nickname)
+    if success:
+        await update.message.reply_text(f"✅ Your nickname has been set to '{nickname}'.")
+    else:
+        await update.message.reply_text("❌ This nickname is already taken. Please choose another one.")
+
+
 async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     telegram_id = update.effective_user.id
+
+    if not is_authenticated(telegram_id):
+        await update.message.reply_text("❌ You must log in first using /login <token>.")
+        return
+
     if not has_nickname(telegram_id):
         await update.message.reply_text("❌ You need to set a nickname first using /setname <nickname>.")
         return
@@ -55,26 +133,3 @@ async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         except Exception as e:
             print(f"Could not send to {recipient_id}: {e}")
-
-
-async def setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    telegram_id = update.effective_user.id
-
-    if not context.args:
-        await update.message.reply_text("Usage: /setname <nickname>")
-        return
-
-    nickname = context.args[0].strip()
-
-    if len(nickname) < 3 or len(nickname) > 20:
-        await update.message.reply_text("Nickname must be between 3 and 20 characters.")
-        return
-    if not nickname.isalnum():
-        await update.message.reply_text("Nickname must be alphanumeric (letters/numbers only).")
-        return
-
-    success = set_nickname(telegram_id, nickname)
-    if success:
-        await update.message.reply_text(f"✅ Your nickname has been set to '{nickname}'.")
-    else:
-        await update.message.reply_text("❌ This nickname is already taken (case-insensitive). Please choose another one.")

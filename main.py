@@ -10,6 +10,8 @@ app = ApplicationBuilder().token(BOT_TOKEN).build()
 app.add_handler(CommandHandler("start", commands.start))
 app.add_handler(CommandHandler("post", commands.post))
 app.add_handler(CommandHandler("setname", commands.setname))
+app.add_handler(CommandHandler("login", commands.login))
+app.add_handler(CommandHandler("generate_token", commands.generate_token))
 
 
 print("Bot is running...")
