@@ -12,6 +12,6 @@ app.add_handler(CommandHandler("post", commands.post))
 app.add_handler(CommandHandler("setname", commands.setname))
 
 
-print("Bot läuft...")
+print("Bot is running...")
 app.run_polling()
 
