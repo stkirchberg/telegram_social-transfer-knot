@@ -12,8 +12,8 @@ app.add_handler(CommandHandler("post", commands.post))
 app.add_handler(CommandHandler("setname", commands.setname))
 app.add_handler(CommandHandler("login", commands.login))
 app.add_handler(CommandHandler("generate_token", commands.generate_token))
+app.add_handler(CommandHandler("deleteuser", commands.deleteuser))
 
 
 print("Bot is running...")
 app.run_polling()
-
