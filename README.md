@@ -72,10 +72,11 @@ python main.py
 
 ## 📖 Usage
 
-1. Start the bot in Telegram with `/start`.  
-2. Set a nickname using `/setname <nickname>`.  
-3. Post a message using `/post <text>`.  
-4. Your message is automatically broadcasted to all users.  
+1. Start the bot in Telegram with `/start`.
+2. Login with `/login <token>`
+3. Set a nickname using `/setname <nickname>`.  
+4. Post a message using `/post <text>`.  
+5. Your message is automatically broadcasted to all users.  
 
 ---
 
