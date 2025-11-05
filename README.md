@@ -30,6 +30,7 @@
 | `/deleteuser <nickname or telegram_id>` | *(Admin only)* Delete a user and all their posts. |
 
 > ⚠️ You must log in and set a nickname before posting.
+> 
 > ⚠️ Note: The `/feed` and `/like` commands are no longer used. Posts are automatically delivered.  
 
 ---
