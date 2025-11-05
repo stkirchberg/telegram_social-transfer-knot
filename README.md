@@ -27,7 +27,7 @@
 | `/setname <nickname>` | Set your unique nickname. |
 | `/post <text>` | Create a new post that is broadcast to all users. |
 | `/generate_token [amount]` | *(Admin only)* Generate one or multiple new tokens. |
-| `/deleteuser <nickname|telegram_id>` | *(Admin only)* Delete a user and all their posts. |
+| `/deleteuser <nickname or telegram_id>` | *(Admin only)* Delete a user and all their posts. |
 
 > ⚠️ You must log in and set a nickname before posting.
 > ⚠️ Note: The `/feed` and `/like` commands are no longer used. Posts are automatically delivered.  
