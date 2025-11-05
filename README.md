@@ -10,21 +10,26 @@
 
 ## ✨ Features
 
-- Users can **set their own nickname** (unique, case-insensitive).  
-- Post messages via `/post <text>` and have them **automatically broadcast** to all registered users.  
-- Messages display the sender’s nickname in **bold** for clarity.  
-- Lightweight, decentralized, and easy to run locally.  
-- SQLite database for persistent storage.  
+- Users must **log in with a one-time token** before posting.  
+- Users can set a **unique, alphanumeric nickname** (3–20 characters, case-insensitive).  
+- Messages posted with `/post <text>` are **automatically broadcast** to all registered users.  
+- Admin commands for **token generation** and **user deletion**.  
+- Persistent local storage using SQLite.
 
 ---
 
 ## 🛠 Commands
 
 | Command | Description |
-|---------|-------------|
-| `/setname <nickname>` | Set your unique nickname before posting. |
-| `/post <text>` | Create a new post that will be sent to all users. |
+|--------|-------------|
+| `/start` | Displays a welcome message and instructions for new users. |
+| `/login <token>` | Log in using a one-time token. |
+| `/setname <nickname>` | Set your unique nickname. |
+| `/post <text>` | Create a new post that is broadcast to all users. |
+| `/generate_token [amount]` | *(Admin only)* Generate one or multiple new tokens. |
+| `/deleteuser <nickname|telegram_id>` | *(Admin only)* Delete a user and all their posts. |
 
+> ⚠️ You must log in and set a nickname before posting.
 > ⚠️ Note: The `/feed` and `/like` commands are no longer used. Posts are automatically delivered.  
 
 ---
