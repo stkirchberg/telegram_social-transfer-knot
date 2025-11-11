@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](https://opensource.org/licenses/MIT)
 [![Telegram](https://img.shields.io/badge/Telegram-Bot-blue.svg)](https://telegram.org/)
 
-**Social Transfer Knot (STK)** is a decentralized mini-social network built entirely on Telegram. Users can post messages, broadcast them automatically to all other users, and manage their personal nickname — all without storing messages on Telegram servers.
+**Social Transfer Knot (STK)** is a decentralized chat network built entirely on Telegram. Users can post messages, broadcast them automatically to all other users, and manage their personal nickname — all without storing messages on Telegram servers.
 
 ---
 
