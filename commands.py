@@ -15,7 +15,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/setname <nickname>\n\n"
         "Available commands:\n"
         "/login <token> – Access with a one-time password\n"
-        "/setname <nickname> – Choose your nickname\n"
+        "/setname <nickname> – Choose your nickname\n\n"
         "You can now post messages by just sending text!\n"
     )
     await update.message.reply_text(welcome_message)
