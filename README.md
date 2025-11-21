@@ -12,7 +12,7 @@
 
 - Users must **log in with a one-time token** before posting.  
 - Users can set a **unique, alphanumeric nickname** (3–20 characters, case-insensitive).  
-- Messages posted with `/post <text>` are **automatically broadcast** to all registered users.  
+- Messages posted are **automatically broadcast** to all registered users.  
 - Admin commands for **token generation** and **user deletion**.  
 - Persistent local storage using SQLite.
 
@@ -25,7 +25,6 @@
 | `/start` | Displays a welcome message and instructions for new users. |
 | `/login <token>` | Log in using a one-time token. |
 | `/setname <nickname>` | Set your unique nickname. |
-| `/post <text>` | Create a new post that is broadcast to all users. |
 | `/generate_token [amount]` | *(Admin only)* Generate one or multiple new tokens. |
 | `/deleteuser <nickname or telegram_id>` | *(Admin only)* Delete a user and all their posts. |
 
