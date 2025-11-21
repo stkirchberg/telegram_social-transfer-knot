@@ -3,8 +3,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from db import c, conn, get_or_create_user, has_nickname, set_nickname, is_authenticated, delete_user
 
-
-ADMIN_ID = 123456789  # RELPACE WITH YOUR TELEGRAM ID TO BE AN ADMIN
+ADMIN_ID = 123456789  # REPLACE WITH YOUR TELEGRAM ID TO BE AN ADMIN
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -17,7 +16,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Available commands:\n"
         "/login <token> – Access with a one-time password\n"
         "/setname <nickname> – Choose your nickname\n"
-        "/post <text> – Create a new post\n"
+        "You can now post messages by just sending text!\n"
     )
     await update.message.reply_text(welcome_message)
 
@@ -112,7 +111,8 @@ async def setname(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ This nickname is already taken. Please choose another one.")
 
 
-async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def post_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle normal text messages (without /post) as posts"""
     telegram_id = update.effective_user.id
 
     if not is_authenticated(telegram_id):
@@ -123,24 +123,26 @@ async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ You need to set a nickname first using /setname <nickname>.")
         return
 
-    user_id = get_or_create_user(telegram_id)
-    text = ' '.join(context.args)
+    text = update.message.text.strip()
     if not text:
-        await update.message.reply_text("Please provide some text: /post Your text here")
         return
 
+    await _save_and_broadcast_post(telegram_id, text, context)
+
+
+async def _save_and_broadcast_post(telegram_id, text, context):
+    """Helper to save a post and broadcast it to all users"""
+    user_id = get_or_create_user(telegram_id)
     c.execute("INSERT INTO posts (user_id, text) VALUES (?, ?)", (user_id, text))
     conn.commit()
+
     c.execute("SELECT id, created_at FROM posts WHERE rowid = last_insert_rowid()")
     post_id, created_at = c.fetchone()
 
     c.execute("SELECT nickname FROM users WHERE telegram_id=?", (telegram_id,))
     nickname = c.fetchone()[0]
 
-    broadcast_text = (
-        f"<b>{nickname}</b> (ID {post_id}, {created_at}):\n"
-        f"{text}"
-    )
+    broadcast_text = f"<b>{nickname}</b> (ID {post_id}, {created_at}):\n{text}"
 
     c.execute("SELECT telegram_id FROM users")
     recipients = c.fetchall()
@@ -154,3 +156,4 @@ async def post(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         except Exception as e:
             print(f"Could not send to {recipient_id}: {e}")
+
