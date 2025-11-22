@@ -25,8 +25,10 @@
 | `/start` | Displays a welcome message and instructions for new users. |
 | `/login <token>` | Log in using a one-time token. |
 | `/setname <nickname>` | Set your unique nickname. |
+| `/commands` | See all commands. |
 | `/generate_token [amount]` | *(Admin only)* Generate one or multiple new tokens. |
 | `/deleteuser <nickname or telegram_id>` | *(Admin only)* Delete a user and all their posts. |
+| `/users` | *(Admin only)* A list of all users. |
 
 
 > ⚠️ You must log in and set a nickname before posting.
