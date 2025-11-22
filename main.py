@@ -12,6 +12,8 @@ app.add_handler(CommandHandler("setname", commands.setname))
 app.add_handler(CommandHandler("login", commands.login))
 app.add_handler(CommandHandler("generate_token", commands.generate_token))
 app.add_handler(CommandHandler("deleteuser", commands.deleteuser))
+app.add_handler(CommandHandler("commands", commands.commands_list))
+
 
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, commands.post_message))
 

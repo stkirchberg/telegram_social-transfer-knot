@@ -12,11 +12,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Before you can use this bot, you need to log in with a one-time token:\n"
         "/login <token>\n\n"
         "After that, set your nickname:\n"
-        "/setname <nickname>\n\n"
+        "/setname <nickname>\n"
+        "You can now post messages by just sending text!\n\n"
+
         "Available commands:\n"
         "/login <token> – Access with a one-time password\n"
-        "/setname <nickname> – Choose your nickname\n\n"
-        "You can now post messages by just sending text!\n"
+        "/setname <nickname> – Choose your nickname\n"
+        "/commands – See all commands\n\n"
     )
     await update.message.reply_text(welcome_message)
 
