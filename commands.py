@@ -5,6 +5,16 @@ from db import c, conn, get_or_create_user, has_nickname, set_nickname, is_authe
 
 ADMIN_ID = 123456789  # REPLACE WITH YOUR TELEGRAM ID TO BE AN ADMIN
 
+USER_COMMANDS = [
+    "/login <token> – Access with a one-time password",
+    "/setname <nickname> – Choose your nickname",
+    "/commands – See all commands"
+]
+
+ADMIN_COMMANDS = [
+    "/generate_token <amount> – Generate new login tokens",
+    "/deleteuser <nickname or telegram_id> – Delete a user and their posts"
+]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_message = (
@@ -14,7 +24,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "After that, set your nickname:\n"
         "/setname <nickname>\n"
         "You can now post messages by just sending text!\n\n"
-
         "Available commands:\n"
         "/login <token> – Access with a one-time password\n"
         "/setname <nickname> – Choose your nickname\n"
@@ -159,3 +168,11 @@ async def _save_and_broadcast_post(telegram_id, text, context):
         except Exception as e:
             print(f"Could not send to {recipient_id}: {e}")
 
+
+async def commands_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = "Available commands:\n\n" + "\n".join(USER_COMMANDS)
+
+    if update.effective_user.id == ADMIN_ID:
+        text += "\n\n Admin commands:\n" + "\n".join(ADMIN_COMMANDS)
+
+    await update.message.reply_text(text)
