@@ -27,6 +27,7 @@
 | `/setname <nickname>` | Set your unique nickname. |
 | `/generate_token [amount]` | *(Admin only)* Generate one or multiple new tokens. |
 | `/deleteuser <nickname or telegram_id>` | *(Admin only)* Delete a user and all their posts. |
+| `/users` | *(Admin only)* A list of all users. |
 
 
 > ⚠️ You must log in and set a nickname before posting.
