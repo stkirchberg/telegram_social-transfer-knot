@@ -76,7 +76,7 @@ python main.py
 1. Start the bot in Telegram with `/start`.
 2. Login with `/login <token>`
 3. Set a nickname using `/setname <nickname>`.  
-4. Post a message using `/post <text>`.  
+4. Post a message 
 5. Your message is automatically broadcasted to all users.  
 
 ---
