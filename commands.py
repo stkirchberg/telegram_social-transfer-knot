@@ -197,3 +197,10 @@ async def users_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text_lines.append(line)
 
     await update.message.reply_text("\n".join(text_lines))
+
+async def unknown_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle unknown commands and suggest /commands"""
+    await update.message.reply_text(
+        "❌ Unknown command.\n"
+        "You can see all available commands with /commands."
+    )

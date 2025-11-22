@@ -16,6 +16,7 @@ app.add_handler(CommandHandler("commands", commands.commands_list))
 app.add_handler(CommandHandler("users", commands.users_list))
 
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, commands.post_message))
+app.add_handler(MessageHandler(filters.COMMAND, commands.unknown_command))
 
 print("Bot is running...")
 app.run_polling()
