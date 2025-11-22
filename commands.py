@@ -177,3 +177,22 @@ async def commands_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text += "\n\n Admin commands:\n" + "\n".join(ADMIN_COMMANDS)
 
     await update.message.reply_text(text)
+
+async def users_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text("❌ You are not allowed to see all users.")
+        return
+
+    c.execute("SELECT id, nickname, telegram_id, created_at FROM users ORDER BY id")
+    users = c.fetchall()
+
+    if not users:
+        await update.message.reply_text("ℹ️ No users registered yet.")
+        return
+
+    text_lines = ["👥 Registered users:"]
+    for user_id, nickname, telegram_id, created_at in users:
+        line = f"ID {user_id}: {nickname or '(no nickname)'} – Created at: {created_at}"
+        text_lines.append(line)
+
+    await update.message.reply_text("\n".join(text_lines))
