@@ -15,6 +15,7 @@ USER_COMMANDS = [
 ADMIN_COMMANDS = [
     "/generate_token <amount> – Generate new login tokens",
     "/deleteuser <nickname or telegram_id> – Delete a user and their posts"
+    "/users – List all registered users"
 ]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
