@@ -6,6 +6,7 @@ from db import c, conn, get_or_create_user, has_nickname, set_nickname, is_authe
 ADMIN_ID = 123456789  # REPLACE WITH YOUR TELEGRAM ID TO BE AN ADMIN
 
 USER_COMMANDS = [
+    "/start – Start the bot",
     "/login <token> – Access with a one-time password",
     "/setname <nickname> – Choose your nickname",
     "/commands – See all commands"
