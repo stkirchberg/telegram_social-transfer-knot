@@ -4,7 +4,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](https://opensource.org/licenses/MIT)
 [![Telegram](https://img.shields.io/badge/Telegram-Bot-blue.svg)](https://telegram.org/)
 
-**Social Transfer Knot (STK)** is a hierarchical-decentralized chat network built entirely on Telegram. Users can post messages, broadcast them automatically to all other users, and manage their personal nickname — all without storing messages on Telegram servers.
+**Social Transfer Knot (STK)** is a hierarchical-decentralized chat network built entirely on Telegram. Users can post messages, broadcast them automatically to all other users, and manage their personal nickname — all without* storing messages on Telegram servers.
+*Telegram stores the messages that are on your device. However, Telegram has no overview of the users or who the messages come from, as everything comes “from” the bot.
+So when you search the chats of someone in the group, nothing can be identified as you. (Unless the administrator's computer is confiscated, your Telegram IDs will be visible in their databases.)
 
 ---
 
