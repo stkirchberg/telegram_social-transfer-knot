@@ -10,7 +10,7 @@ So when you search the chats of someone in the group, nothing can be identified 
 
 ---
 
-## ✨ Features
+## Features
 
 - Users must **log in with a one-time token** before posting.  
 - Users can set a **unique, alphanumeric nickname** (3–20 characters, case-insensitive).  
@@ -20,7 +20,7 @@ So when you search the chats of someone in the group, nothing can be identified 
 
 ---
 
-## 🛠 Commands
+## Commands
 
 | Command | Description |
 |--------|-------------|
@@ -39,7 +39,7 @@ So when you search the chats of someone in the group, nothing can be identified 
 
 ---
 
-## 🚀 Installation
+## Installation
 
 1. Clone the repository:
 
@@ -64,7 +64,7 @@ python main.py
 
 ---
 
-## 💾 Database Structure
+## Database Structure
 
 - **users** – stores Telegram ID, nickname, and timestamp.  
 - **posts** – stores the user ID, post text, and timestamp.  
@@ -73,7 +73,7 @@ python main.py
 
 ---
 
-## 📖 Usage
+## Usage
 
 1. Start the bot in Telegram with `/start`.
 2. Login with `/login <token>`
@@ -83,7 +83,7 @@ python main.py
 
 ---
 
-## ⚡ Notes
+## Notes
 
 - Nicknames are **case-insensitive and unique**.  
 - All messages are stored **locally**, not on Telegram servers.  
@@ -91,6 +91,6 @@ python main.py
 
 ---
 
-## 📝 License
+## License
 
 MIT License – feel free to use, modify, and distribute.  
