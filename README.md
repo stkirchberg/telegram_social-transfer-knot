@@ -33,9 +33,9 @@ So when you search the chats of someone in the group, nothing can be identified 
 | `/users` | *(Admin only)* A list of all users. |
 
 
-> ⚠️ You must log in and set a nickname before posting.
+> You must log in and set a nickname before posting.
 
-> ⚠️ Note: The `/feed` and `/like` commands are no longer used. Posts are automatically delivered.  
+> Note: The `/feed` and `/like` commands are no longer used. Posts are automatically delivered.  
 
 ---
 
