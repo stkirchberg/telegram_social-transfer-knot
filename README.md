@@ -86,7 +86,7 @@ python main.py
 ## Notes
 
 - Nicknames are **case-insensitive and unique**.  
-- All messages are stored **locally**, not on Telegram servers.  
+- All messages are stored **locally**.  
 - Works best in small to medium communities.  
 
 ---
